@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Friends Snake — PWA</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#222a35">
+</head>
+<body>
+  <header>
+    <h1>Friends Snake</h1>
+    <div class="controls">
+      <button id="startBtn">Start</button>
+      <button id="pauseBtn">Pause</button>
+      <label>Volume <input id="vol" type="range" min="0" max="1" step="0.01" value="0.2"></label>
+      <button id="installBtn" hidden>Install PWA</button>
+    </div>
+  </header>
+
+  <main>
+    <canvas id="game" width="640" height="480"></canvas>
+    <aside id="hud">
+      <div>Score: <span id="score">0</span></div>
+      <div>Speed: <span id="speed">1</span></div>
+      <div>Power: <span id="power">None</span></div>
+      <div>Use arrow keys / WASD to move</div>
+      <div class="credits">Theme: friendly, original assets (no copyrighted characters)</div>
+    </aside>
+  </main>
+
+  <audio id="bgm" loop src="assets/bgm.wav"></audio>
+
+  <script src="app.js"></script>
+  <script>
+    // install prompt handling for PWA
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.hidden = false;
+    });
+    installBtn.addEventListener('click', async () => {
+      installBtn.hidden = true;
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+      }
+    });
+    // register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').catch(console.error);
+    }
+  </script>
+</body>
+</html>
